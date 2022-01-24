@@ -1,4 +1,4 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,6 +8,7 @@ dataSources:
     source:
       address: "0x9c527cea78e7ec46678f7007410a070a912927ca"
       abi: SimpleERC721StakingPool
+      startBlock: 10043907
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -22,8 +23,6 @@ dataSources:
         - name: SimpleERC721StakingPool
           file: ./abis/SimpleERC721StakingPool.json
       eventHandlers:
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: RewardAdded(uint256)
           handler: handleRewardAdded
         - event: RewardPaid(indexed address,uint256)

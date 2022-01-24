@@ -7,72 +7,56 @@ import {
   Staked,
   Withdrawn
 } from "../generated/SimpleERC721StakingPool/SimpleERC721StakingPool"
-import { ExampleEntity } from "../generated/schema"
-
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
-  }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
-
-  // Entities can be written to the store with `.save()`
-  entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.DURATION(...)
-  // - contract.balanceOf(...)
-  // - contract.earned(...)
-  // - contract.isRewardDistributor(...)
-  // - contract.lastTimeRewardApplicable(...)
-  // - contract.lastUpdateTime(...)
-  // - contract.onERC721Received(...)
-  // - contract.owner(...)
-  // - contract.ownerOf(...)
-  // - contract.paused(...)
-  // - contract.periodFinish(...)
-  // - contract.rewardPerToken(...)
-  // - contract.rewardPerTokenStored(...)
-  // - contract.rewardRate(...)
-  // - contract.rewardToken(...)
-  // - contract.rewards(...)
-  // - contract.stakeToken(...)
-  // - contract.totalSupply(...)
-  // - contract.userRewardPerTokenPaid(...)
-}
+import { StakedGroupie } from "../generated/schema"
 
 export function handleRewardAdded(event: RewardAdded): void {}
 
 export function handleRewardPaid(event: RewardPaid): void {}
 
-export function handleStaked(event: Staked): void {}
+export function handleStaked(event: Staked): void {
+  let idStaked = event.params.idList
+  let from = event.params.user
+  let entity = StakedGroupie.load(from.toHex())
 
-export function handleWithdrawn(event: Withdrawn): void {}
+  // Entities only exist after they have been saved to the store;
+  // `null` checks allow to create entities on demand
+  if (!entity) {
+    entity = new StakedGroupie(from.toHex())
+    let arr = new Array<BigInt>()
+    for(let i=0; i<idStaked.length; i++) {
+      arr.push(idStaked[i])
+    }
+    entity.idList = arr
+  } else {
+    let arr = entity.idList
+    if (!arr) {
+      arr = new Array<BigInt>()
+    }
+    for(let i=0; i<idStaked.length; i++) {
+      arr.push(idStaked[i])
+    }
+    entity.idList = arr
+  }
+  entity.save()
+}
+
+export function handleWithdrawn(event: Withdrawn): void {
+  let idUnstaked = event.params.idList
+  let from = event.params.user
+  let entity = StakedGroupie.load(from.toHex())
+  if (!entity) {
+    entity = new StakedGroupie(from.toHex())
+  }
+  let arr = entity.idList
+  if (!arr) {
+    arr = new Array<BigInt>()
+  }
+  for(let i=0; i<idUnstaked.length; i++) {
+    let index = arr.indexOf(idUnstaked[i])
+    if (index > -1) {
+      arr.splice(index, 1)
+    }
+  }
+  entity.idList = arr
+  entity.save()
+}
