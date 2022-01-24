@@ -1,0 +1,35 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: SimpleERC721StakingPool
+    network: rinkeby
+    source:
+      address: "0x9c527cea78e7ec46678f7007410a070a912927ca"
+      abi: SimpleERC721StakingPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - OwnershipTransferred
+        - RewardAdded
+        - RewardPaid
+        - Staked
+        - Withdrawn
+      abis:
+        - name: SimpleERC721StakingPool
+          file: ./abis/SimpleERC721StakingPool.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid
+        - event: Staked(indexed address,uint256[])
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256[])
+          handler: handleWithdrawn
+      file: ./src/mapping.ts

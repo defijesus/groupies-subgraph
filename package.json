@@ -1,0 +1,16 @@
+{
+  "name": "groupies-staking",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ groupies-staking",
+    "create-local": "graph create --node http://localhost:8020/ groupies-staking",
+    "remove-local": "graph remove --node http://localhost:8020/ groupies-staking",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 groupies-staking"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.26.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  }
+}
